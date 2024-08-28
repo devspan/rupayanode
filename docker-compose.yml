@@ -1,7 +1,7 @@
 version: '3'
 services:
   rupx-node:
-    image: docker.io/rupaya/rupayanode:latest
+    build: .
     volumes:
       - ./rupaya:/root/.rupaya
       - ./keystore:/root/.rupaya/keystore:ro
@@ -20,27 +20,6 @@ services:
       - HTTP_API=${HTTP_API:-eth,net,web3}
       - WS_API=${WS_API:-eth,net,web3}
       - VERBOSITY=${VERBOSITY:-3}
-    command:
-      - --datadir=/root/.rupaya
-      - --networkid=${NETWORK_ID}
-      - --syncmode=full
-      - --gcmode=archive
-      - --http
-      - --http.addr=0.0.0.0
-      - --http.port=8545
-      - --http.api=${HTTP_API}
-      - --http.corsdomain=${HTTP_CORSDOMAIN}
-      - --http.vhosts=${HTTP_VHOSTS}
-      - --ws
-      - --ws.addr=0.0.0.0
-      - --ws.port=8546
-      - --ws.api=${WS_API}
-      - --mine
-      - --miner.etherbase=${MINER_ETHERBASE}
-      - --unlock=${UNLOCK_ACCOUNT}
-      - --password=/dev/null
-      - --allow-insecure-unlock
-      - --verbosity=${VERBOSITY}
     networks:
       - rupaya-network
 
