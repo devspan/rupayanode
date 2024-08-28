@@ -39,6 +39,7 @@ services:
       - --miner.etherbase=${MINER_ETHERBASE}
       - --unlock=${UNLOCK_ACCOUNT}
       - --password=/dev/null
+      - --allow-insecure-unlock
       - --verbosity=${VERBOSITY}
     networks:
       - rupaya-network
