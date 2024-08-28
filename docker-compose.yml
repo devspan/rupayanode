@@ -1,0 +1,48 @@
+version: '3'
+services:
+  rupx-node:
+    image: docker.io/rupaya/rupayanode:latest
+    volumes:
+      - ./rupaya:/root/.rupaya
+      - ./keystore:/root/.rupaya/keystore:ro
+    ports:
+      - "${HTTP_PORT:-8545}:8545"
+      - "${WS_PORT:-8546}:8546"
+      - "${P2P_PORT:-30303}:30303"
+      - "${P2P_PORT:-30303}:30303/udp"
+    environment:
+      - NETWORK_ID=${NETWORK_ID:-499}
+      - MINER_ETHERBASE=${MINER_ETHERBASE}
+      - UNLOCK_ACCOUNT=${UNLOCK_ACCOUNT}
+      - ACCOUNT_PASSWORD=${ACCOUNT_PASSWORD}
+      - HTTP_CORSDOMAIN=${HTTP_CORSDOMAIN:-https://*.rupaya.io}
+      - HTTP_VHOSTS=${HTTP_VHOSTS:-rupaya.io,*.rupaya.io}
+      - HTTP_API=${HTTP_API:-eth,net,web3}
+      - WS_API=${WS_API:-eth,net,web3}
+      - VERBOSITY=${VERBOSITY:-3}
+    command:
+      - --datadir=/root/.rupaya
+      - --networkid=${NETWORK_ID}
+      - --syncmode=full
+      - --gcmode=archive
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=${HTTP_API}
+      - --http.corsdomain=${HTTP_CORSDOMAIN}
+      - --http.vhosts=${HTTP_VHOSTS}
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.api=${WS_API}
+      - --mine
+      - --miner.etherbase=${MINER_ETHERBASE}
+      - --unlock=${UNLOCK_ACCOUNT}
+      - --password=/dev/null
+      - --verbosity=${VERBOSITY}
+    networks:
+      - rupaya-network
+
+networks:
+  rupaya-network:
+    external: true
