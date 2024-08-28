@@ -1,7 +1,7 @@
-version: '3'
+version: '3.8'
 services:
   rupx-node:
-    build: .
+    image: rupaya/rupaya-node:latest
     volumes:
       - ./rupaya:/root/.rupaya
       - ./keystore:/root/.rupaya/keystore:ro
@@ -14,15 +14,20 @@ services:
       - NETWORK_ID=${NETWORK_ID:-499}
       - MINER_ETHERBASE=${MINER_ETHERBASE}
       - UNLOCK_ACCOUNT=${UNLOCK_ACCOUNT}
-      - ACCOUNT_PASSWORD=${ACCOUNT_PASSWORD}
-      - HTTP_CORSDOMAIN=${HTTP_CORSDOMAIN:-https://*.rupaya.io}
-      - HTTP_VHOSTS=${HTTP_VHOSTS:-rupaya.io,*.rupaya.io}
-      - HTTP_API=${HTTP_API:-eth,net,web3}
-      - WS_API=${WS_API:-eth,net,web3}
+      - HTTP_CORSDOMAIN=${HTTP_CORSDOMAIN:-*}
+      - HTTP_VHOSTS=${HTTP_VHOSTS:-*}
+      - HTTP_API=${HTTP_API:-eth,web3,net,debug,txpool,personal}
+      - WS_API=${WS_API:-eth,web3,net,debug,txpool,personal}
       - VERBOSITY=${VERBOSITY:-3}
+    secrets:
+      - account_password
     networks:
       - rupaya-network
 
 networks:
   rupaya-network:
     external: true
+
+secrets:
+  account_password:
+    file: ./account_password.txt

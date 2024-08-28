@@ -22,39 +22,30 @@ else
     echo "Genesis block already initialized. Skipping initialization."
 fi
 
-# Write the password to a file
-echo "$ACCOUNT_PASSWORD" > /tmp/account_password
-
-# Attempt to unlock the account
-echo "Attempting to unlock account $UNLOCK_ACCOUNT..."
-/app/rupx --datadir /root/.rupaya account unlock "$UNLOCK_ACCOUNT" --password /tmp/account_password
-
-if [ $? -ne 0 ]; then
-    echo "Failed to unlock account. Please check your account address and password."
-    exit 1
-fi
-
-echo "Account unlocked successfully."
+# Read password from the secret file
+ACCOUNT_PASSWORD=$(cat /run/secrets/account_password)
 
 # Start rupx with all the necessary parameters
 exec /app/rupx \
-    --datadir=/root/.rupaya \
-    --networkid=${NETWORK_ID:-499} \
-    --syncmode=full \
-    --gcmode=archive \
+    --networkid ${NETWORK_ID:-499} \
+    --syncmode "full" \
+    --gcmode "archive" \
     --http \
-    --http.addr=0.0.0.0 \
-    --http.port=8545 \
-    --http.api=${HTTP_API:-eth,net,web3} \
-    --http.corsdomain=${HTTP_CORSDOMAIN:-https://*.rupaya.io} \
-    --http.vhosts=${HTTP_VHOSTS:-rupaya.io,*.rupaya.io} \
+    --http.addr "0.0.0.0" \
+    --http.port 8545 \
+    --http.api "${HTTP_API:-eth,web3,net,debug,txpool,personal}" \
+    --http.corsdomain "${HTTP_CORSDOMAIN:-*}" \
+    --http.vhosts "${HTTP_VHOSTS:-*}" \
     --ws \
-    --ws.addr=0.0.0.0 \
-    --ws.port=8546 \
-    --ws.api=${WS_API:-eth,net,web3} \
+    --ws.addr "0.0.0.0" \
+    --ws.port 8546 \
+    --ws.api "${WS_API:-eth,web3,net,debug,txpool,personal}" \
     --mine \
-    --miner.etherbase=${MINER_ETHERBASE} \
-    --unlock=${UNLOCK_ACCOUNT} \
-    --password=/tmp/account_password \
+    --miner.etherbase "${MINER_ETHERBASE}" \
+    --unlock "${UNLOCK_ACCOUNT}" \
+    --password <(echo "$ACCOUNT_PASSWORD") \
     --allow-insecure-unlock \
-    --verbosity=${VERBOSITY:-3}
+    --keystore "/root/.rupaya/keystore" \
+    --rpc.allow-unprotected-txs \
+    --verbosity ${VERBOSITY:-3} \
+    console
